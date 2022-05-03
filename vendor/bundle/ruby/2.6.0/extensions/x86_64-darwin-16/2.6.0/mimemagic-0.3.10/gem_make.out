@@ -1,3 +1,0 @@
-current directory: /Users/yasuyuki/uber_app/vendor/bundle/ruby/2.6.0/gems/mimemagic-0.3.10/ext/mimemagic
-/Users/yasuyuki/.rbenv/versions/2.6.4/bin/ruby -I/Users/yasuyuki/.rbenv/versions/2.6.4/lib/ruby/site_ruby/2.6.0 -rrubygems /Users/yasuyuki/uber_app/vendor/bundle/ruby/2.6.0/gems/rake-13.0.6/exe/rake RUBYARCHDIR\=/Users/yasuyuki/uber_app/vendor/bundle/ruby/2.6.0/extensions/x86_64-darwin-16/2.6.0/mimemagic-0.3.10 RUBYLIBDIR\=/Users/yasuyuki/uber_app/vendor/bundle/ruby/2.6.0/extensions/x86_64-darwin-16/2.6.0/mimemagic-0.3.10
-mkdir -p /Users/yasuyuki/uber_app/vendor/bundle/ruby/2.6.0/extensions/x86_64-darwin-16/2.6.0/mimemagic-0.3.10/mimemagic
