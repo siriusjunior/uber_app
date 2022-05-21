@@ -127,12 +127,23 @@ return(
     {
       state.isOpenOrderDialog &&
       <FoodOrderDialog
-        food={state.selectedFood}
         isOpen={state.isOpenOrderDialog}
+        food={state.selectedFood}
+        countNumber={state.selectedFoodCount}
+        onClickCountUp={()=> setState({
+          ...state,
+          selectedFoodCount: state.selectedFoodCount + 1,
+        })}
+        onClickCountDown={()=> setState({
+          ...state,
+          selectedFoodCount: state.selectedFoodCount - 1,
+        })}
         onClose={() => setState({
           // 枠外clickで発動
           ...state,
           isOpenOrderDialog: false,
+          selectedFood: null,
+          selectedFoodCount: 1,
         })}
       />
     }
