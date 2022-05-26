@@ -4,15 +4,16 @@ module Api
       before_action :set_food, only: %i[create replace]
 
       def index
-        # 仮注文は1店舗に限定される、他店舗の仮注文がないことを確認してcreateしている(Cf.L24)
         line_foods = LineFood.active
+        # 仮注文一覧は1店舗に限定される、他店舗の仮注文がないことを確認してcreateしている(Cf.L24)
         if line_foods.exists?
           render json: {
             line_food_ids: line_foods.map { |line_food|line_food.id },
             restaurant: line_foods[0].restaurant,
-            # それぞれの仮注文個数を合算
             count: line_foods.sum { |line_food|line_food[:count] },
+            # それぞれの仮注文個数を合算
             amount: line_foods.sum { |line_food|line_food.total_amount },
+            # 仮注文ごとの小計を合算
           }, status: :ok
         else
           render json: {}, status: :no_content
@@ -43,7 +44,7 @@ module Api
 
       # 店舗間の仮注文の活性・非活性化
       def replace
-        # 仮注文時の他店舗の仮注文の非活性化,店舗内の仮注文であればactive保持
+        # 仮注文時の他店舗の仮注文をまとめて非活性化,店舗内の仮注文であればactive保持
         LineFood.active.other_restaurant(@ordered_food.restaurant.id).each do |line_food|
           line_food.update!(active: false)
         end
