@@ -33,11 +33,12 @@ const MainLogoImage = styled.img`
 `;
 
 const MainCoverImageWrapper = styled.div`
-  text-alight: center;
+  width: 60%;
+  margin: 0 auto;
 `;
 
 const MainCover = styled.img`
-  height: 600px;
+  height: 550px;
 `;
 
 const RestaurantsContentsList = styled.div`
@@ -47,9 +48,8 @@ const RestaurantsContentsList = styled.div`
 `;
 
 const RestaurantsContentWrapper = styled.div`
-  width: 450px;
-  height: 300px;
-  padding: 48px;
+  width: 350px;
+  height: 200px;
 `;
 
 const RestaurantsImageNode = styled.img`
@@ -97,20 +97,20 @@ export const Restaurants = () => {
         {
           state.fetchState === REQUEST_STATE.LOADING?
             <Fragment>
-              <SKeleton variant="rect" width={450} height={300} />
-              <SKeleton variant="rect" width={450} height={300} />
-              <SKeleton variant="rect" width={450} height={300} />
+              <SKeleton variant="rect" width={350} height={200} />
+              <SKeleton variant="rect" width={350} height={200} />
+              <SKeleton variant="rect" width={350} height={200} />
             </Fragment>
           :
-            state.restaurantsList.map((item, index)=>
-              <Link to={`/restaurants/${item.id}/foods`} key={index} style={{ textDecoration:'none' }}>
-                <RestaurantsContentWrapper>
-                  <RestaurantsImageNode src={RestaurantImage} />
-                  <MainText>{item.name}</MainText>
-                  <SubText>{`配送料:${item.fee}円${item.time_required}分`}</SubText>
-                </RestaurantsContentWrapper>
-              </Link>
-            )
+          state.restaurantsList.map((item, index)=>
+            <Link to={`/restaurants/${item.id}/foods`} key={index} style={{ textDecoration:'none' }}>
+              <RestaurantsContentWrapper>
+                <RestaurantsImageNode src={RestaurantImage} />
+                <MainText>{item.name}</MainText>
+                <SubText>{`配送料:${item.fee}円${item.time_required}分`}</SubText>
+              </RestaurantsContentWrapper>
+            </Link>
+          )
         }
       </RestaurantsContentsList>
     </Fragment>

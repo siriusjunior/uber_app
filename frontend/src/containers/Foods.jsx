@@ -1,12 +1,13 @@
 import React, { Fragment,useReducer, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Link } from "react-router-dom";
+import { useHistory, Link } from "react-router-dom";
 
 // components
 import { LocalMallIcon } from '../components/Icons';
 import { FoodWrapper } from '../components/FoodWrapper';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { FoodOrderDialog } from '../components/FoodOrderDialog';
+import { NewOrderConfirmDialog } from '../components/NewOrderConfirmDialog';
 
 // reducers
 import {
@@ -17,14 +18,15 @@ import {
 
 // apis
 import { fetchFoods } from '../apis/foods';
+import { postLineFoods, replaceLineFoods } from '../apis/line_foods';
+
+// constants
+import { COLORS } from '../style_constants';
+import { HTTP_STATUS_CODE, REQUEST_STATE } from '../constants';
 
 // images
 import MainLogo from '../images/logo.png'
 import FoodImage from '../images/food-image.jpg'
-
-// constants
-import { COLORS } from '../style_constants';
-import { REQUEST_STATE } from '../constants';
 
 const HeaderWrapper = styled.div`
   display: flex;
@@ -58,15 +60,18 @@ const ItemWrapper = styled.div`
 export const Foods = ({
   match
 }) => {
-  const [foodsState, dispatch] = useReducer(foodsReducer, foodsInitialState);
-  
-  // モダールのためのState
   const initialState = {
     isOpenOrderDialog: false,
+    isOpenNewOrderDialog: false,
     selectedFood: null,
     selectedFoodCount: 1,
+    existingRestaurantName: '', // Cf.L101
+    newRestaurantName: '',
   }
+
   const[state, setState] = useState(initialState);
+  const [foodsState, dispatch] = useReducer(foodsReducer, foodsInitialState);
+  const history = useHistory();
 
   useEffect(() => {
     dispatch({ type: foodsActionTypes.FETCHING });
@@ -81,6 +86,35 @@ export const Foods = ({
         });
       })
   },[]);
+
+  const submitOrder = () => {
+    postLineFoods({
+      foodId: state.selectedFood.id,
+      count: state.selectedFoodCount,
+      // Cf.163
+    }).then(() => history.push('/orders'))
+      // リクエスト中に他店舗のactiveな仮注文が存在する場合の制御(Cf.line_foods_controller#create(L23))
+      .catch((e)=> {
+        if(e.response.status === HTTP_STATUS_CODE.NOT_ACCEPTABLE){
+          setState({
+            ...state,
+            isOpenOrderDialog: false,
+            isOpenNewOrderDialog: true,
+            existingRestaurantName: e.response.data.existing_restaurant,
+            newRestaurantName: e.response.data.new_restaurant,
+          })
+        } else {
+          throw e;
+        }
+      })
+  };
+
+  const replaceOrder = () => {
+    replaceLineFoods({
+      foodId: state.selectedFood.id,
+      count: state.selectedFoodCount,
+    }).then(() => history.push('/orders'))
+  };
 
 return(
   <Fragment>
@@ -107,7 +141,8 @@ return(
           }
         </Fragment>
       :
-        foodsState.foodsList.map(food => 
+      // 店舗内のフード一覧配置
+      foodsState.foodsList.map(food => 
           <ItemWrapper key={food.id}>
             <FoodWrapper 
               food={food}
@@ -138,6 +173,7 @@ return(
           ...state,
           selectedFoodCount: state.selectedFoodCount - 1,
         })}
+        onClickOrder={() => submitOrder()}
         onClose={() => setState({
           // 枠外clickで発動
           ...state,
@@ -145,6 +181,16 @@ return(
           selectedFood: null,
           selectedFoodCount: 1,
         })}
+      />
+    }
+    {
+      state.isOpenNewOrderDialog &&
+      <NewOrderConfirmDialog 
+        isOpen={state.isOpenNewOrderDialog}
+        onClose={() => setState({...state,isOpenNewOrderDialog: false})}
+        existingRestaurantName= {state.existingRestaurantName}
+        newRestaurantName= {state.newRestaurantName}
+        onClickSubmit={()=> replaceOrder()}
       />
     }
   </Fragment>
